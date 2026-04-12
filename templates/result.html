@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+    .result-layout {
+        display: grid;
+        gap: 24px;
+        grid-template-columns: minmax(260px, 0.35fr) minmax(0, 0.65fr);
+    }
+
+    .result-summary,
+    .result-reading {
+        padding: 28px;
+    }
+
+    .reading-box {
+        background: #f6f8fb;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: #39485d;
+        line-height: 1.8;
+        margin-top: 18px;
+        padding: 20px;
+        white-space: pre-wrap;
+    }
+
+    .result-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 22px;
+    }
+
+    @media (max-width: 900px) {
+        .result-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<section class="page-section">
+    <div class="content-wrap result-layout">
+        <aside class="panel result-summary">
+            <span class="section-kicker">Reading ready</span>
+            <h1 class="page-title">{{ name|default:"Your" }} Kundli</h1>
+            <p class="page-copy">Review the reading, then ask the AI chat for any specific follow-up question.</p>
+            <div class="result-actions">
+                <a class="btn btn-primary" href="{% url 'chatbot' %}">Ask Follow-up</a>
+                <a class="btn btn-secondary" href="{% url 'kundli' %}">New Reading</a>
+            </div>
+        </aside>
+
+        <section class="panel result-reading">
+            <span class="section-kicker">Prediction</span>
+            <h2 class="page-title">Personal guidance</h2>
+            {% if error %}
+                <div class="reading-box">{{ error }}{% if error_detail %}<br><br>{{ error_detail }}{% endif %}</div>
+            {% else %}
+                <div class="reading-box">{{ prediction|default:"Your prediction will appear here after the kundli is generated." }}</div>
+            {% endif %}
+        </section>
+    </div>
+</section>
+
+{% endblock %}

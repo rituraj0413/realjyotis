@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+    .chat-layout {
+        display: grid;
+        gap: 24px;
+        grid-template-columns: minmax(260px, 0.42fr) minmax(0, 0.58fr);
+    }
+
+    .chat-intro,
+    .chat-panel {
+        padding: 28px;
+    }
+
+    .prompt-list {
+        display: grid;
+        gap: 12px;
+        margin-top: 24px;
+    }
+
+    .prompt-list button {
+        background: #ffffff;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: #435269;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 700;
+        padding: 13px 14px;
+        text-align: left;
+    }
+
+    .chat-box {
+        background: #f6f8fb;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        height: 420px;
+        overflow-y: auto;
+        padding: 16px;
+    }
+
+    .chat-message {
+        border-radius: 8px;
+        line-height: 1.6;
+        max-width: 86%;
+        padding: 12px 14px;
+    }
+
+    .chat-message.user {
+        align-self: flex-end;
+        background: var(--teal);
+        color: #ffffff;
+    }
+
+    .chat-message.ai {
+        align-self: flex-start;
+        background: #ffffff;
+        border: 1px solid var(--line);
+        color: #39485d;
+    }
+
+    .chat-form {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: minmax(0, 1fr) auto;
+        margin-top: 14px;
+    }
+
+    @media (max-width: 900px) {
+        .chat-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 560px) {
+        .chat-form {
+            grid-template-columns: 1fr;
+        }
+
+        .chat-message {
+            max-width: 100%;
+        }
+    }
+</style>
+
+<section class="page-section">
+    <div class="content-wrap chat-layout">
+        <aside class="panel chat-intro">
+            <span class="section-kicker">AI astrology chat</span>
+            <h1 class="page-title">Ask a focused question.</h1>
+            <p class="page-copy">Short, specific questions usually receive clearer guidance.</p>
+
+            <div class="prompt-list" aria-label="Suggested questions">
+                <button type="button" onclick="usePrompt('What should I focus on in my career this month?')">Career focus this month</button>
+                <button type="button" onclick="usePrompt('What relationship pattern should I understand better?')">Relationship pattern</button>
+                <button type="button" onclick="usePrompt('What is a good spiritual practice for my current phase?')">Spiritual practice</button>
+            </div>
+        </aside>
+
+        <section class="panel chat-panel">
+            <div id="chat-box" class="chat-box" aria-live="polite">
+                <div class="chat-message ai">Ask me about career, love, timing, or personal growth. I will keep it practical.</div>
+            </div>
+
+            <div class="chat-form">
+                <input type="text" id="user-input" placeholder="Type your question..." aria-label="Question">
+                <button onclick="sendMessage()" class="btn btn-primary" type="button">Send</button>
+            </div>
+        </section>
+    </div>
+</section>
+
+<script>
+function escapeHTML(value) {
+    return value.replace(/[&<>"']/g, function (character) {
+        return {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#039;"
+        }[character];
+    });
+}
+
+function addMessage(type, message) {
+    var chatBox = document.getElementById("chat-box");
+    var item = document.createElement("div");
+    item.className = "chat-message " + type;
+    item.innerHTML = escapeHTML(message);
+    chatBox.appendChild(item);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function usePrompt(message) {
+    document.getElementById("user-input").value = message;
+    document.getElementById("user-input").focus();
+}
+
+function sendMessage() {
+    var input = document.getElementById("user-input");
+    var message = input.value.trim();
+
+    if (!message) {
+        return;
+    }
+
+    addMessage("user", message);
+    input.value = "";
+
+    fetch("{% url 'chatbot_api' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: "message=" + encodeURIComponent(message)
+    })
+    .then(function(response) {
+        return response.json();
+    })
+    .then(function(data) {
+        addMessage("ai", data.reply || "I could not prepare a reply right now.");
+    })
+    .catch(function() {
+        addMessage("ai", "Something went wrong. Please try again.");
+    });
+}
+
+document.getElementById("user-input").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        sendMessage();
+    }
+});
+</script>
+
+{% endblock %}

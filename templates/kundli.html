@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+    .kundli-form {
+        padding: 32px;
+    }
+
+    .kundli-notes {
+        display: grid;
+        gap: 14px;
+        margin-top: 22px;
+    }
+
+    .note-item {
+        background: #ffffff;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 16px;
+    }
+
+    .note-item strong {
+        color: var(--ink);
+        display: block;
+        margin-bottom: 6px;
+    }
+
+    .note-item span {
+        color: var(--muted);
+        line-height: 1.6;
+    }
+</style>
+
+<section class="page-section">
+    <div class="content-wrap split-layout">
+        <aside class="visual-panel panel">
+            <span class="section-kicker">Kundli generator</span>
+            <h1>Enter the details once. Get a focused reading.</h1>
+            <p>A clear birth chart prompt helps the AI return better guidance for personality, career, and relationships.</p>
+        </aside>
+
+        <section class="panel kundli-form">
+            <span class="section-kicker">Birth details</span>
+            <h1 class="page-title">Generate Kundli</h1>
+            <p class="page-copy">Add accurate birth information for a more useful astrology reading.</p>
+
+            <form method="POST" style="margin-top: 24px;">
+                {% csrf_token %}
+                <div class="form-field">
+                    <label for="name">Full name</label>
+                    <input id="name" type="text" name="name" placeholder="Enter full name" required>
+                </div>
+                <div class="form-field">
+                    <label for="dob">Date of birth</label>
+                    <input id="dob" type="date" name="dob" required>
+                </div>
+                <div class="form-field">
+                    <label for="time">Birth time</label>
+                    <input id="time" type="time" name="time" required>
+                </div>
+                <div class="form-field">
+                    <label for="place">Birth place</label>
+                    <input id="place" type="text" name="place" placeholder="City, state, country" required>
+                </div>
+                <button class="btn btn-primary" type="submit">Generate Reading</button>
+            </form>
+
+            <div class="kundli-notes">
+                <div class="note-item">
+                    <strong>Accuracy matters</strong>
+                    <span>Use the closest known birth time and city for a more relevant reading.</span>
+                </div>
+                <div class="note-item">
+                    <strong>Keep questions ready</strong>
+                    <span>After the result, use AI chat for deeper career, love, or timing questions.</span>
+                </div>
+            </div>
+        </section>
+    </div>
+</section>
+
+{% endblock %}

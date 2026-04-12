@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+    .consult-layout {
+        display: grid;
+        gap: 24px;
+        grid-template-columns: minmax(260px, 0.42fr) minmax(0, 0.58fr);
+    }
+
+    .consult-info,
+    .consult-form {
+        padding: 28px;
+    }
+
+    .pandit-grid {
+        display: grid;
+        gap: 12px;
+        margin: 24px 0;
+    }
+
+    .pandit-option {
+        background: #f6f8fb;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        cursor: pointer;
+        display: grid;
+        gap: 6px;
+        padding: 16px;
+    }
+
+    .pandit-option input {
+        min-height: auto;
+        width: auto;
+    }
+
+    .pandit-option strong {
+        color: var(--ink);
+    }
+
+    .pandit-option span {
+        color: var(--muted);
+        line-height: 1.6;
+    }
+
+    .amount-panel {
+        background: var(--teal-soft);
+        border: 1px solid rgba(15, 118, 110, 0.18);
+        border-radius: 8px;
+        color: var(--teal);
+        font-weight: 800;
+        margin-top: 22px;
+        padding: 16px;
+    }
+
+    @media (max-width: 900px) {
+        .consult-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<section class="page-section">
+    <div class="content-wrap consult-layout">
+        <aside class="panel consult-info">
+            <span class="section-kicker">Consult with pandit</span>
+            <h1 class="page-title">Book a guided astrology session.</h1>
+            <p class="page-copy">Choose a pandit, select your preferred date and time, then complete payment to confirm the consultation.</p>
+
+            <div class="amount-panel">Choose a pandit profile below. Each profile can have a different consultation fee.</div>
+        </aside>
+
+        <section class="panel consult-form">
+            <span class="section-kicker">Booking details</span>
+            <h2 class="page-title">Select your slot</h2>
+
+            {% if messages %}
+                <ul class="messages" style="margin-top: 18px;">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <form method="POST" style="margin-top: 22px;">
+                {% csrf_token %}
+
+                <div class="pandit-grid">
+	                    {% for pandit in pandits %}
+	                        <label class="pandit-option">
+	                            <input type="radio" name="pandit" value="{{ pandit.id }}" {% if forloop.first %}checked{% endif %} required>
+	                            <strong>{{ pandit.name }} | &#8377;{{ pandit.consultation_fee }}</strong>
+	                            <span>{{ pandit.expertise }}</span>
+	                            {% if pandit.bio %}
+	                                <span>{{ pandit.bio }}</span>
+	                            {% endif %}
+	                        </label>
+	                    {% endfor %}
+	                </div>
+
+                <div class="form-field">
+                    <label for="date">Preferred date</label>
+                    <input id="date" type="date" name="date" required>
+                </div>
+
+	                <div class="form-field">
+	                    <label for="time">Preferred time</label>
+	                    <input id="time" type="time" name="time" required>
+	                </div>
+
+                    <div class="form-field">
+                        <label for="question">What do you want to ask?</label>
+                        <textarea id="question" name="question" rows="4" placeholder="Example: I want to know about my career growth this year."></textarea>
+                    </div>
+
+	                <button class="btn btn-primary" type="submit">Continue to Payment</button>
+            </form>
+        </section>
+    </div>
+</section>
+
+{% endblock %}

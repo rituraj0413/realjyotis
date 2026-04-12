@@ -1,0 +1,263 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+    .dash-grid {
+        display: grid;
+        gap: 20px;
+        grid-template-columns: minmax(280px, 0.42fr) minmax(0, 0.58fr);
+    }
+
+    .dash-panel {
+        padding: 28px;
+    }
+
+    .wallet-hero {
+        background: linear-gradient(135deg, #191611 0%, #2d2414 48%, #5c4312 100%);
+        border-radius: 8px;
+        color: #fff4d7;
+        padding: 20px;
+        margin-top: 24px;
+    }
+
+    .wallet-hero strong {
+        color: #f6d37b;
+        display: block;
+        font-size: 34px;
+        margin-top: 8px;
+    }
+
+    .wallet-meta {
+        color: #e8d8b0;
+        line-height: 1.7;
+        margin-top: 10px;
+    }
+
+    .package-grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        margin-top: 22px;
+    }
+
+    .package-card,
+    .booking-card,
+    .wallet-card {
+        background: #fffaf0;
+        border: 1px solid #e6d6aa;
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .package-card h3,
+    .booking-card h3,
+    .wallet-card h3 {
+        margin: 0 0 8px;
+    }
+
+    .package-card p,
+    .booking-card p,
+    .wallet-card p {
+        color: var(--muted);
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    .package-price {
+        color: #2b2115;
+        display: block;
+        font-size: 30px;
+        font-weight: 800;
+        margin: 10px 0 8px;
+    }
+
+    .package-tag,
+    .status-badge {
+        background: #f5e4b0;
+        border-radius: 8px;
+        color: #73520b;
+        display: inline-flex;
+        font-size: 13px;
+        font-weight: 800;
+        margin-top: 12px;
+        padding: 8px 10px;
+    }
+
+    .wallet-list,
+    .booking-list {
+        display: grid;
+        gap: 14px;
+        margin-top: 22px;
+    }
+
+    .dashboard-image-strip {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: 1fr 1fr;
+        margin-top: 24px;
+    }
+
+    .dashboard-image-strip img {
+        border-radius: 8px;
+        height: 180px;
+        object-fit: cover;
+        width: 100%;
+    }
+
+    .wallet-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 16px;
+    }
+
+    .wallet-actions form {
+        margin: 0;
+    }
+
+    .booking-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    .session-note {
+        color: #6f4b00;
+        font-size: 14px;
+        font-weight: 700;
+        margin-top: 12px;
+    }
+
+    .session-note.expired {
+        color: #b42318;
+    }
+
+    @media (max-width: 980px) {
+        .dash-grid,
+        .package-grid,
+        .dashboard-image-strip {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<section class="page-section">
+    <div class="content-wrap dash-grid">
+        <aside class="panel dash-panel">
+            <span class="section-kicker">User dashboard</span>
+            <h1 class="page-title">Welcome, {{ request.user.username }}.</h1>
+            <p class="page-copy">Recharge your wallet, choose a package, and keep your pandit consultation activity in one place.</p>
+
+            <div class="wallet-hero">
+                <span class="section-kicker" style="color: #f0c96d;">Wallet balance</span>
+                <strong>&#8377;{{ profile.wallet_balance }}</strong>
+                <p class="wallet-meta">
+                    Minimum recharge to talk to pandit: &#8377;100 for the first 10 minutes.
+                    <br>
+                    {% if active_package %}
+                        Active package: {{ active_package.package_name }}
+                        {% if active_package.unlimited_until %}
+                            until {{ active_package.unlimited_until|date:"M d, Y H:i" }}
+                        {% endif %}
+                    {% else %}
+                        No package active yet. Pick one below to get started.
+                    {% endif %}
+                </p>
+            </div>
+
+            <div class="dashboard-image-strip">
+                <img src="https://i.pinimg.com/originals/5b/34/27/5b34279d85b20cff9fe3d55917ad6755.png" alt="Vedic astrology prediction artwork">
+                <img src="https://i.pinimg.com/originals/6e/03/40/6e0340afe664fd2fa086ceb84e1564e7.jpg" alt="Astrology reading artwork">
+            </div>
+
+            <div class="wallet-actions">
+                <a class="btn btn-primary" href="{% url 'book_pandit' %}">Consult Pandit</a>
+                <a class="btn btn-secondary" href="{% url 'kundli' %}">Generate Kundli</a>
+            </div>
+        </aside>
+
+        <section class="panel dash-panel">
+            <span class="section-kicker">Wallet recharge</span>
+            <h2 class="page-title">Choose your package</h2>
+
+            <div class="package-grid">
+                {% for package_code, package in wallet_packages.items %}
+                    <article class="package-card">
+                        <h3>{{ package.name }}</h3>
+                        <span class="package-price">&#8377;{{ package.amount }}</span>
+                        <p>{{ package.description }}</p>
+                        <span class="package-tag">
+                            {% if package.minutes %}
+                                {{ package.minutes }} minutes included
+                            {% else %}
+                                1 day unlimited access
+                            {% endif %}
+                        </span>
+                        <form method="post" action="{% url 'recharge_wallet' %}" style="margin-top: 16px;">
+                            {% csrf_token %}
+                            <input type="hidden" name="package_code" value="{{ package_code }}">
+                            <button class="btn btn-primary" type="submit">Recharge now</button>
+                        </form>
+                    </article>
+                {% endfor %}
+            </div>
+
+            <div class="wallet-list">
+                <div class="wallet-card">
+                    <span class="section-kicker">Recharge history</span>
+                    {% for transaction in wallet_transactions %}
+                        <div style="border-top: 1px solid #eadfbf; padding: 14px 0;">
+                            <h3>{{ transaction.package_name }}</h3>
+                            <p>
+                                Added &#8377;{{ transaction.amount }} on {{ transaction.created_at|date:"M d, Y H:i" }}
+                                {% if transaction.unlimited_until %}
+                                    <br>Unlimited valid till {{ transaction.unlimited_until|date:"M d, Y H:i" }}
+                                {% elif transaction.minutes_included %}
+                                    <br>{{ transaction.minutes_included }} minutes pack
+                                {% endif %}
+                            </p>
+                        </div>
+                    {% empty %}
+                        <h3>No recharge yet</h3>
+                        <p>Your wallet history will appear here after your first package purchase.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="booking-list">
+                <span class="section-kicker">Your consultations</span>
+                {% for booking in bookings %}
+                    <article class="booking-card">
+                        <h3>{{ booking.pandit.name }}</h3>
+                        <p>{{ booking.date }} at {{ booking.time }} | &#8377;{{ booking.amount }}</p>
+                        {% if booking.question %}
+                            <p>Question: {{ booking.question }}</p>
+                        {% endif %}
+                        <span class="status-badge">{{ booking.get_status_display }}</span>
+                        {% if booking.session_time_label %}
+                            <p class="session-note {% if booking.session_state == 'expired' %}expired{% endif %}">{{ booking.session_time_label }}</p>
+                        {% endif %}
+                        <div class="booking-actions">
+                            {% if booking.session_state == "active" or booking.session_state == "ready" %}
+                                <a class="btn btn-primary" href="{% url 'consultation_room' booking.id %}">Join Room</a>
+                            {% elif booking.session_state == "expired" %}
+                                <a class="btn btn-secondary" href="{% url 'book_pandit' %}">Book Again</a>
+                            {% else %}
+                                <a class="btn btn-secondary" href="{% url 'payment' %}?booking_id={{ booking.id }}">Complete Payment</a>
+                            {% endif %}
+                        </div>
+                    </article>
+                {% empty %}
+                    <article class="booking-card">
+                        <h3>No consultations yet</h3>
+                        <p>Your bookings will appear here after you choose a pandit.</p>
+                    </article>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+</section>
+
+{% endblock %}

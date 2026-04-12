@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="page-section">
+    <div class="content-wrap" style="max-width: 880px;">
+        <section class="panel" style="padding: 32px;">
+            <span class="section-kicker">Email OTP verification</span>
+            <h1 class="page-title">Verify your account</h1>
+            <p class="page-copy">A 6-digit OTP has been sent to <strong>{{ email }}</strong>. Enter it below to activate your account.</p>
+
+            {% if messages %}
+                <ul class="messages" style="margin-top: 18px;">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <form method="POST" style="margin-top: 22px;">
+                {% csrf_token %}
+                <div class="form-field">
+                    <label for="otp">Enter OTP</label>
+                    <input id="otp" type="text" name="otp" maxlength="6" placeholder="Enter 6-digit OTP" required>
+                </div>
+                <button class="btn btn-primary" type="submit">Verify OTP</button>
+                <a class="btn btn-secondary" href="{% url 'resend_otp' user_id %}" style="margin-left: 10px;">Resend OTP</a>
+            </form>
+
+            {% if console_mode %}
+                <div class="panel" style="margin-top: 22px; padding: 20px; background: rgba(255, 251, 244, 0.88);">
+                    <span class="section-kicker">Development note</span>
+                    <p class="page-copy" style="margin-top: 0;">Console email backend is active, so the OTP is printed in the terminal instead of being sent by SMTP.</p>
+                </div>
+            {% endif %}
+
+            {% if error_detail %}
+                <div class="panel" style="margin-top: 18px; padding: 20px; background: rgba(255, 251, 244, 0.88);">
+                    <span class="section-kicker">Debug detail</span>
+                    <p class="page-copy" style="margin-top: 0;">{{ error_detail }}</p>
+                </div>
+            {% endif %}
+
+            <p style="margin-top: 24px;"><a class="muted-link" href="{% url 'login' %}">Go to login</a></p>
+        </section>
+    </div>
+</section>
+
+{% endblock %}

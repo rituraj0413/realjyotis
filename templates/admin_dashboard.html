@@ -1,0 +1,288 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+    .admin-metrics {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        margin-bottom: 22px;
+    }
+
+    .admin-card,
+    .admin-table-panel {
+        background: #ffffff;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .admin-card span {
+        color: var(--muted);
+        display: block;
+        font-size: 13px;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .admin-card strong {
+        color: var(--ink);
+        display: block;
+        font-size: 28px;
+        margin-top: 8px;
+    }
+
+    .admin-table {
+        border-collapse: collapse;
+        margin-top: 18px;
+        width: 100%;
+    }
+
+    .dashboard-visuals {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        margin-top: 24px;
+    }
+
+    .dashboard-image {
+        border-radius: 8px;
+        height: 220px;
+        object-fit: cover;
+        width: 100%;
+    }
+
+    .admin-table th,
+    .admin-table td {
+        border-bottom: 1px solid var(--line);
+        color: #39485d;
+        padding: 12px 10px;
+        text-align: left;
+        vertical-align: top;
+    }
+
+    .admin-table th {
+        color: var(--ink);
+        font-size: 13px;
+        text-transform: uppercase;
+    }
+
+    .table-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .mini-btn {
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 800;
+        padding: 8px 10px;
+        text-decoration: none;
+    }
+
+    .mini-btn.verify {
+        background: var(--teal);
+        color: #ffffff;
+    }
+
+    .mini-btn.reject {
+        background: #fff1f0;
+        color: #b42318;
+    }
+
+    .mini-btn.verified {
+        background: var(--teal-soft);
+        color: var(--teal);
+        cursor: default;
+    }
+
+    @media (max-width: 1000px) {
+        .admin-metrics {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .admin-table {
+            display: block;
+            overflow-x: auto;
+        }
+
+        .dashboard-visuals {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 560px) {
+        .admin-metrics {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<section class="page-section">
+    <div class="content-wrap">
+        <section class="panel" style="padding: 28px;">
+            <span class="section-kicker">Admin dashboard</span>
+            <h1 class="page-title">Track users, pandits, payments, and earnings.</h1>
+            <p class="page-copy">Use this area to verify consultation payments and monitor the marketplace.</p>
+
+            <div class="dashboard-visuals">
+                <img class="dashboard-image" src="https://i.pinimg.com/originals/5b/34/27/5b34279d85b20cff9fe3d55917ad6755.png" alt="Vedic astrology prediction artwork">
+                <img class="dashboard-image" src="https://i.pinimg.com/originals/6e/03/40/6e0340afe664fd2fa086ceb84e1564e7.jpg" alt="Astrology dashboard artwork">
+            </div>
+
+            {% if messages %}
+                <ul class="messages" style="margin-top: 18px;">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <div class="admin-metrics" style="margin-top: 24px;">
+                <article class="admin-card"><span>Users</span><strong>{{ total_users }}</strong></article>
+                <article class="admin-card"><span>Pandits</span><strong>{{ total_pandits }}</strong></article>
+                <article class="admin-card"><span>Verified pandits</span><strong>{{ verified_pandits }}</strong></article>
+                <article class="admin-card"><span>Pending payments</span><strong>{{ pending_bookings }}</strong></article>
+                <article class="admin-card"><span>Revenue</span><strong>&#8377;{{ total_amount }}</strong></article>
+                <article class="admin-card"><span>Wallet recharges</span><strong>&#8377;{{ wallet_revenue }}</strong></article>
+            </div>
+
+            <div class="admin-table-panel">
+                <span class="section-kicker">Recent bookings</span>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Pandit</th>
+                            <th>Slot</th>
+                            <th>Amount</th>
+                            <th>Payment detail</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in bookings %}
+                            <tr>
+                                <td>{{ booking.user.username }}</td>
+                                <td>{{ booking.user.email|default:"-" }}</td>
+                                <td>{{ booking.pandit.name }}</td>
+                                <td>{{ booking.date }}<br>{{ booking.time }}</td>
+                                <td>&#8377;{{ booking.amount }}</td>
+                                <td>
+                                    {% if booking.razorpay_payment_id %}{{ booking.razorpay_payment_id }}<br>{% endif %}
+                                    {% if booking.payment_completed_at %}{{ booking.payment_completed_at|date:"M d, Y H:i" }}{% else %}-{% endif %}
+                                </td>
+	                                <td>{{ booking.get_status_display }}</td>
+	                                <td>
+	                                    <div class="table-actions">
+	                                        {% if booking.status == "verified" or booking.status == "completed" %}
+	                                            <span class="mini-btn verified">Verified</span>
+	                                        {% elif booking.status == "rejected" %}
+	                                            <span class="mini-btn reject">Rejected</span>
+	                                        {% else %}
+	                                            <a class="mini-btn verify" href="{% url 'verify_booking' booking.id %}">Verify</a>
+	                                            <a class="mini-btn reject" href="{% url 'reject_booking' booking.id %}">Reject</a>
+	                                        {% endif %}
+	                                    </div>
+	                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="8">No bookings yet.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="admin-table-panel" style="margin-top: 22px;">
+                <span class="section-kicker">Wallet recharges</span>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Package</th>
+                            <th>Amount</th>
+                            <th>Benefit</th>
+                            <th>Status</th>
+                            <th>Payment ID</th>
+                            <th>Recharged at</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in wallet_transactions %}
+                            <tr>
+                                <td>{{ transaction.user.username }}</td>
+                                <td>{{ transaction.user.email|default:"-" }}</td>
+                                <td>{{ transaction.package_name }}</td>
+                                <td>&#8377;{{ transaction.amount }}</td>
+                                <td>
+                                    {% if transaction.unlimited_until %}
+                                        Unlimited till {{ transaction.unlimited_until|date:"M d, Y H:i" }}
+                                    {% else %}
+                                        {{ transaction.minutes_included }} minutes
+                                    {% endif %}
+                                </td>
+                                <td>{{ transaction.get_status_display }}</td>
+                                <td>{{ transaction.razorpay_payment_id|default:"-" }}</td>
+                                <td>{{ transaction.payment_completed_at|default:transaction.created_at|date:"M d, Y H:i" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="8">No wallet recharge history yet.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="admin-table-panel" style="margin-top: 22px;">
+                <span class="section-kicker">Pandit profiles</span>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Login</th>
+                            <th>Expertise</th>
+                            <th>Fee</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pandit in pandits %}
+                            <tr>
+                                <td>{{ pandit.name }}</td>
+                                <td>{{ pandit.user.username|default:"Not linked" }}</td>
+                                <td>{{ pandit.expertise }}</td>
+                                <td>&#8377;{{ pandit.consultation_fee }}</td>
+	                                <td>{% if pandit.is_verified %}Verified{% else %}Waiting{% endif %}</td>
+	                                <td>
+	                                    <div class="table-actions">
+	                                        {% if pandit.is_verified %}
+	                                            <span class="mini-btn verified">Verified</span>
+	                                            <a class="mini-btn reject" href="{% url 'unverify_pandit' pandit.id %}">Hide</a>
+	                                        {% else %}
+	                                            <a class="mini-btn verify" href="{% url 'verify_pandit' pandit.id %}">Verify</a>
+	                                        {% endif %}
+	                                    </div>
+	                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6">No pandit profiles yet.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="page-section">
+    <div class="content-wrap auth-layout">
+        <aside class="visual-panel panel">
+            <span class="section-kicker">Pandit registration</span>
+            <h1>Create your consultant profile.</h1>
+            <p>Register as a pandit, add your expertise and fee, then wait for admin verification before users can book you.</p>
+        </aside>
+
+        <section class="form-panel panel">
+            <h1>Pandit Register</h1>
+            <p>This login will open your pandit dashboard and earnings once admin verifies your profile.</p>
+
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-field">
+                    <label for="username">Login username</label>
+                    <input id="username" type="text" name="username" placeholder="Choose login username" required>
+                </div>
+
+                <div class="form-field">
+                    <label for="password">Password</label>
+                    <input id="password" type="password" name="password" placeholder="Create password" required>
+                </div>
+
+                <div class="form-field">
+                    <label for="name">Pandit name</label>
+                    <input id="name" type="text" name="name" placeholder="Example: Pandit Shailendra Mishra" required>
+                </div>
+
+                <div class="form-field">
+                    <label for="email">Email</label>
+                    <input id="email" type="email" name="email" placeholder="pandit@example.com" required>
+                </div>
+
+                <div class="form-field">
+                    <label for="phone">Phone</label>
+                    <input id="phone" type="text" name="phone" placeholder="Phone number">
+                </div>
+
+                <div class="form-field">
+                    <label for="expertise">Expertise</label>
+                    <input id="expertise" type="text" name="expertise" placeholder="Career astrology, kundli, marriage matching" required>
+                </div>
+
+                <div class="form-field">
+                    <label for="experience_years">Experience in years</label>
+                    <input id="experience_years" type="number" name="experience_years" min="0" value="0">
+                </div>
+
+                <div class="form-field">
+                    <label for="consultation_fee">Consultation fee</label>
+                    <input id="consultation_fee" type="number" name="consultation_fee" min="1" value="500" required>
+                </div>
+
+                <div class="form-field">
+                    <label for="bio">Profile bio</label>
+                    <textarea id="bio" name="bio" rows="4" placeholder="Write a short profile for users."></textarea>
+                </div>
+
+                <button class="btn btn-primary" type="submit">Submit Profile</button>
+            </form>
+
+            <p style="margin-top: 20px;">Already registered? <a class="muted-link" href="{% url 'login' %}">Login</a></p>
+        </section>
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+    .payment-card {
+        display: grid;
+        gap: 24px;
+        grid-template-columns: minmax(0, 0.95fr) minmax(280px, 0.55fr);
+        padding: 32px;
+    }
+
+    .price-box {
+        background: #f6f8fb;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 22px;
+    }
+
+    .price-box span {
+        color: var(--muted);
+        display: block;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .price-box strong {
+        color: var(--ink);
+        display: block;
+        font-size: 34px;
+        line-height: 1.1;
+    }
+
+    .payment-list {
+        color: var(--muted);
+        line-height: 1.8;
+        margin: 22px 0;
+        padding-left: 20px;
+    }
+
+    @media (max-width: 900px) {
+        .payment-card {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<section class="page-section">
+    <div class="content-wrap">
+        <section class="panel payment-card">
+            <div>
+                <span class="section-kicker">Secure payment</span>
+                <h1 class="page-title">{{ payment_title|default:"Confirm your consultation booking." }}</h1>
+                <p class="page-copy">{{ payment_copy|default:"Complete the payment to reserve your session and continue with the next steps." }}</p>
+
+                {% if messages %}
+                    <ul class="messages" style="margin-top: 18px;">
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                {% if payment_error %}
+                    <div class="price-box" style="margin-top: 18px;">
+                        <span>Payment setup issue</span>
+                        <p class="page-copy" style="margin-top: 0;">{{ payment_error }}</p>
+                    </div>
+                {% endif %}
+
+                <ul class="payment-list">
+                    {% for item in payment_items %}
+                        <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+
+                <button id="pay-btn" class="btn btn-primary" type="button" {% if payment_error %}disabled{% endif %}>Pay Now</button>
+            </div>
+
+            <aside class="price-box">
+                {% if booking %}
+                    <span>Selected pandit</span>
+                    <strong style="font-size: 24px;">{{ booking.pandit.name }}</strong>
+                    <p class="page-copy">{{ booking.date }} at {{ booking.time }}</p>
+                    <hr style="border: 0; border-top: 1px solid var(--line); margin: 18px 0;">
+                {% elif wallet_transaction %}
+                    <span>Selected package</span>
+                    <strong style="font-size: 24px;">{{ wallet_transaction.package_name }}</strong>
+                    <p class="page-copy">
+                        {% if wallet_transaction.minutes_included %}
+                            {{ wallet_transaction.minutes_included }} minutes included
+                        {% else %}
+                            1 day unlimited pandit access
+                        {% endif %}
+                    </p>
+                    <hr style="border: 0; border-top: 1px solid var(--line); margin: 18px 0;">
+                {% endif %}
+                <span>Amount</span>
+                <strong>&#8377;{% widthratio payment.amount|default:"50000" 100 1 %}</strong>
+                <p class="page-copy">Razorpay receives the amount in paise from the order.</p>
+            </aside>
+        </section>
+    </div>
+</section>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+var options = {
+    "key": "{{ razorpay_key }}",
+    "amount": "{{ payment.amount }}",
+    "currency": "INR",
+    "order_id": "{{ payment.id }}",
+    "handler": function (response){
+        fetch("{% url 'payment_success' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body:
+                "booking_id={{ booking.id|default:'' }}" +
+                "&wallet_id={{ wallet_transaction.id|default:'' }}" +
+                "&razorpay_payment_id=" + encodeURIComponent(response.razorpay_payment_id || "") +
+                "&razorpay_order_id=" + encodeURIComponent(response.razorpay_order_id || "")
+        })
+        .then(function(res) {
+            return res.json();
+        })
+        .then(function(data) {
+            alert("Payment successful. Receipt status: " + (data.receipt_status || "sent"));
+            if (data.redirect_url) {
+                window.location.href = data.redirect_url;
+            }
+        })
+        .catch(function() {
+            alert("Payment succeeded, but receipt update failed. Please contact admin.");
+        });
+    }
+};
+
+if (options.order_id) {
+    var rzp = new Razorpay(options);
+
+    document.getElementById("pay-btn").onclick = function(event){
+        rzp.open();
+        event.preventDefault();
+    };
+}
+</script>
+
+{% endblock %}

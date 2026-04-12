@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+    .metric-grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        margin-bottom: 22px;
+    }
+
+    .metric-card,
+    .consult-card {
+        background: #ffffff;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .metric-card span {
+        color: var(--muted);
+        display: block;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .metric-card strong {
+        color: var(--ink);
+        display: block;
+        font-size: 28px;
+    }
+
+    .consult-list {
+        display: grid;
+        gap: 14px;
+    }
+
+    .pandit-visual {
+        border-radius: 8px;
+        height: 240px;
+        margin-top: 24px;
+        object-fit: cover;
+        width: 100%;
+    }
+
+    .consult-card h3 {
+        margin: 0 0 8px;
+    }
+
+    .consult-card p {
+        color: var(--muted);
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    .consult-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    .session-note {
+        color: #6f4b00;
+        font-size: 14px;
+        font-weight: 700;
+        margin-top: 12px;
+    }
+
+    .session-note.expired {
+        color: #b42318;
+    }
+
+    @media (max-width: 900px) {
+        .metric-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<section class="page-section">
+    <div class="content-wrap">
+        <section class="panel" style="padding: 28px;">
+            <span class="section-kicker">Pandit dashboard</span>
+            {% if pandit %}
+                <h1 class="page-title">{{ pandit.name }}</h1>
+                <p class="page-copy">{{ pandit.bio|default:pandit.expertise }}</p>
+                <img class="pandit-visual" src="https://i.pinimg.com/originals/6e/03/40/6e0340afe664fd2fa086ceb84e1564e7.jpg" alt="Astrology consultation artwork">
+                {% if not pandit.is_verified %}
+                    <div class="metric-card" style="margin-top: 20px; background: #fff8e8;">
+                        <span>Verification status</span>
+                        <strong style="font-size: 20px;">Waiting for admin approval</strong>
+                    </div>
+                {% endif %}
+
+                <div class="metric-grid" style="margin-top: 24px;">
+                    <article class="metric-card">
+                        <span>Total consultations</span>
+                        <strong>{{ bookings|length }}</strong>
+                    </article>
+                    <article class="metric-card">
+                        <span>Verified bookings</span>
+                        <strong>{{ verified_bookings }}</strong>
+                    </article>
+                    <article class="metric-card">
+                        <span>Your earnings</span>
+                        <strong>&#8377;{{ total_earnings }}</strong>
+                    </article>
+                </div>
+
+                <div class="consult-list">
+                    {% for booking in bookings %}
+                        <article class="consult-card">
+                            <h3>{{ booking.user.username }}</h3>
+                            <p>{{ booking.date }} at {{ booking.time }} | {{ booking.get_status_display }}</p>
+                            {% if booking.question %}
+                                <p>Question: {{ booking.question }}</p>
+                            {% endif %}
+                            {% if booking.session_time_label %}
+                                <p class="session-note {% if booking.session_state == 'expired' %}expired{% endif %}">{{ booking.session_time_label }}</p>
+                            {% endif %}
+                            <div class="consult-actions">
+                                {% if booking.session_state == "active" or booking.session_state == "ready" %}
+                                    <a class="btn btn-primary" href="{% url 'consultation_room' booking.id %}">Join Room</a>
+                                {% elif booking.session_state == "expired" %}
+                                    <span class="section-kicker" style="color: #b42318;">Session expired</span>
+                                {% else %}
+                                    <span class="section-kicker">Waiting for payment</span>
+                                {% endif %}
+                            </div>
+                        </article>
+                    {% empty %}
+                        <article class="consult-card">
+                            <h3>No bookings yet</h3>
+                            <p>Verified consultation requests will appear here.</p>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <h1 class="page-title">Profile not linked</h1>
+                <p class="page-copy">Ask admin to link this login account to a pandit profile.</p>
+            {% endif %}
+        </section>
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,450 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+    .promo-marquee {
+        background: linear-gradient(135deg, rgba(116, 79, 17, 0.96), rgba(191, 141, 43, 0.94));
+        border-bottom: 1px solid rgba(255, 223, 149, 0.32);
+        overflow: hidden;
+        padding: 10px 0;
+    }
+
+    .promo-track {
+        display: flex;
+        gap: 36px;
+        min-width: max-content;
+        animation: promo-slide 20s linear infinite;
+        padding-left: 100%;
+        white-space: nowrap;
+    }
+
+    .promo-item {
+        color: #fff4d6;
+        font-size: 14px;
+        font-weight: 800;
+        letter-spacing: 0;
+    }
+
+    .home-hero {
+        background:
+            linear-gradient(135deg, rgba(255, 248, 220, 0.94), rgba(246, 224, 154, 0.84)),
+            url('https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1800&q=80');
+        background-position: center;
+        background-size: cover;
+        min-height: calc(100vh - 116px);
+        padding: 52px 24px 56px;
+    }
+
+    .home-shell {
+        display: grid;
+        gap: 24px;
+        grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+        margin: 0 auto;
+        max-width: 1180px;
+    }
+
+    .home-panel,
+    .home-visual,
+    .feature-card {
+        background: rgba(255, 248, 228, 0.88);
+        border: 1px solid rgba(212, 175, 55, 0.24);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(16px);
+    }
+
+    .home-panel {
+        padding: 28px;
+    }
+
+    .home-panel h1 {
+        color: var(--ink);
+        font-size: 48px;
+        line-height: 1.06;
+        margin: 0;
+    }
+
+    .home-panel p {
+        color: var(--muted);
+        font-size: 17px;
+        line-height: 1.75;
+        margin: 18px 0 0;
+    }
+
+    .home-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 28px;
+    }
+
+    .contact-chip {
+        align-items: center;
+        background: linear-gradient(135deg, rgba(233, 198, 117, 0.22), rgba(255, 243, 213, 0.48));
+        border: 1px solid rgba(200, 154, 61, 0.18);
+        border-radius: 8px;
+        color: #7a5b18;
+        display: inline-flex;
+        font-size: 14px;
+        font-weight: 800;
+        margin-top: 18px;
+        padding: 10px 12px;
+        text-decoration: none;
+    }
+
+    .home-visual {
+        background:
+            linear-gradient(180deg, rgba(16, 12, 8, 0.18), rgba(16, 12, 8, 0.44)),
+            radial-gradient(circle at top center, rgba(255, 214, 120, 0.26), transparent 30%),
+            url('https://i.pinimg.com/originals/5b/34/27/5b34279d85b20cff9fe3d55917ad6755.png');
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        min-height: 420px;
+        overflow: hidden;
+        padding: 28px;
+        position: relative;
+    }
+
+    .visual-badge {
+        background: rgba(16, 12, 8, 0.68);
+        border: 1px solid rgba(203, 154, 51, 0.34);
+        border-radius: 8px;
+        color: #f5d58e;
+        display: inline-block;
+        font-size: 14px;
+        font-weight: 800;
+        padding: 10px 12px;
+    }
+
+    .visual-copy {
+        bottom: 28px;
+        left: 28px;
+        max-width: 280px;
+        position: absolute;
+    }
+
+    .visual-copy strong {
+        color: #fff4dc;
+        display: block;
+        font-size: 24px;
+        line-height: 1.2;
+        margin-bottom: 10px;
+    }
+
+    .visual-copy span {
+        color: rgba(255, 236, 198, 0.86);
+        display: block;
+        line-height: 1.7;
+    }
+
+    .home-strip {
+        background:
+            linear-gradient(180deg, rgba(255, 249, 228, 0.84), rgba(247, 228, 173, 0.42)),
+            linear-gradient(135deg, #fff5cf 0%, #f4df9d 100%);
+        border-top: 1px solid rgba(212, 175, 55, 0.32);
+        padding: 24px 24px 48px;
+    }
+
+    .feature-grid {
+        display: grid;
+        gap: 18px;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        margin: 0 auto;
+        max-width: 1180px;
+    }
+
+    .feature-card {
+        background:
+            linear-gradient(180deg, rgba(242, 203, 84, 0.98), rgba(196, 145, 33, 0.92)),
+            linear-gradient(135deg, #efc552 0%, #b98722 100%);
+        border: 1px solid rgba(126, 89, 17, 0.28);
+        box-shadow:
+            inset 0 1px 0 rgba(255, 236, 173, 0.52),
+            inset 0 -14px 28px rgba(95, 63, 10, 0.16),
+            0 16px 28px rgba(106, 76, 18, 0.12);
+        min-height: 170px;
+        padding: 20px;
+        text-decoration: none;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .feature-card:hover {
+        border-color: rgba(103, 73, 14, 0.40);
+        box-shadow:
+            inset 0 1px 0 rgba(255, 236, 173, 0.56),
+            inset 0 -18px 34px rgba(74, 49, 8, 0.22),
+            0 26px 44px rgba(82, 56, 8, 0.28);
+        transform: translateY(-4px);
+    }
+
+    .feature-card::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(90deg, #6e4a10, #c9962e);
+    }
+
+    .feature-card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(255, 235, 170, 0.18), transparent 32%);
+        pointer-events: none;
+    }
+
+    .feature-icon {
+        align-items: center;
+        background: linear-gradient(135deg, #b8860b, #d4af37);
+        border: 1px solid rgba(122, 85, 20, 0.18);
+        border-radius: 8px;
+        box-shadow:
+            inset 0 1px 0 rgba(255, 240, 189, 0.34),
+            0 8px 18px rgba(184, 134, 11, 0.16);
+        color: #fff5df;
+        display: inline-flex;
+        font-size: 22px;
+        font-weight: 800;
+        height: 48px;
+        justify-content: center;
+        width: 48px;
+    }
+
+    .feature-card h2 {
+        color: #17120a;
+        font-size: 20px;
+        font-weight: 800;
+        margin: 18px 0 10px;
+    }
+
+    .feature-card p {
+        color: #2e2411;
+        line-height: 1.65;
+        margin: 0;
+    }
+
+    .comments-section {
+        background:
+            radial-gradient(circle at top right, rgba(212, 175, 55, 0.20), transparent 22%),
+            linear-gradient(180deg, rgba(255, 248, 221, 0.62), rgba(238, 206, 106, 0.12)),
+            linear-gradient(135deg, #fff5cb 0%, #f2dc97 100%);
+        padding: 52px 24px 70px;
+    }
+
+    .comments-layout {
+        display: grid;
+        gap: 24px;
+        grid-template-columns: minmax(280px, 0.42fr) minmax(0, 0.58fr);
+        margin: 0 auto;
+        max-width: 1180px;
+    }
+
+    .comment-form,
+    .comment-list-panel {
+        padding: 28px;
+    }
+
+    .comment-list {
+        display: grid;
+        gap: 14px;
+        margin-top: 22px;
+    }
+
+    .comment-card {
+        background: rgba(255, 251, 242, 0.92);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 16px;
+    }
+
+    .comment-card strong {
+        color: var(--ink);
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .comment-card p {
+        color: var(--muted);
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    .comment-card span {
+        color: #8a96a8;
+        display: block;
+        font-size: 13px;
+        font-weight: 700;
+        margin-top: 10px;
+    }
+
+    @media (max-width: 900px) {
+        .home-shell,
+        .feature-grid,
+        .comments-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 560px) {
+        .home-hero {
+            min-height: auto;
+            padding: 28px 14px 34px;
+        }
+
+        .home-panel h1 {
+            font-size: 36px;
+        }
+    }
+
+    @keyframes promo-slide {
+        0% {
+            transform: translateX(0);
+        }
+        100% {
+            transform: translateX(-50%);
+        }
+    }
+</style>
+
+<section class="promo-marquee" aria-label="Consultation offer">
+    <div class="promo-track">
+        <span class="promo-item">Consult with Pandit Ji for 2 hours at &#8377;1499.</span>
+        <span class="promo-item">Consult with Pandit Ji till you feel satisfied at &#8377;1999.</span>
+        <span class="promo-item">Personal guidance for career, love, timing, and life direction.</span>
+        <span class="promo-item">Consult with Pandit Ji for 2 hours at &#8377;1499.</span>
+        <span class="promo-item">Consult with Pandit Ji till you feel satisfied at &#8377;1999.</span>
+        <span class="promo-item">Personal guidance for career, love, timing, and life direction.</span>
+    </div>
+</section>
+
+<section class="home-hero">
+    <div class="home-shell">
+        <section class="home-panel">
+            <span class="section-kicker">RealJyotish</span>
+            <h1>RealJyotish - Astrology guidance, tools, and consultations in one place.</h1>
+            <p>RealJyotish brings together kundli readings, AI astrology guidance, consultation booking, public comments, and profile-based dashboards for users, pandits, and admin.</p>
+            <a class="contact-chip" href="mailto:realjyotish0001@gmail.com">Contact: realjyotish0001@gmail.com</a>
+            <div class="home-actions">
+                {% if user.is_authenticated %}
+                    <a class="btn btn-primary" href="{% url 'dashboard' %}">Open Dashboard</a>
+                    <a class="btn btn-secondary" href="{% url 'kundli' %}">Free Kundli</a>
+                {% else %}
+                    <a class="btn btn-primary" href="{% url 'signup' %}">Create Account</a>
+                    <a class="btn btn-secondary" href="{% url 'pandit_signup' %}">Pandit Register</a>
+                {% endif %}
+            </div>
+        </section>
+
+        <aside class="home-visual">
+            <span class="visual-badge">Interactive astrology workspace</span>
+            <div class="visual-copy">
+                <strong>Career, love, timing, and consultation flow.</strong>
+                <span>Built for customers, pandits, and admin tracking with real dashboards.</span>
+            </div>
+        </aside>
+    </div>
+</section>
+
+<section class="home-strip">
+    <div class="feature-grid">
+        <a class="feature-card" href="{% url 'kundli' %}">
+            <span class="feature-icon">K</span>
+            <h2>Free Kundli</h2>
+            <p>Generate astrology guidance from birth details in a few clicks.</p>
+        </a>
+        <a class="feature-card" href="{% url 'chatbot' %}">
+            <span class="feature-icon">A</span>
+            <h2>AI Astrology</h2>
+            <p>Ask practical questions about career, love, and personal growth.</p>
+        </a>
+        <a class="feature-card" href="{% url 'book_pandit' %}">
+            <span class="feature-icon">P</span>
+            <h2>Consult Pandit</h2>
+            <p>Choose a pandit, book a slot, and complete payment securely.</p>
+        </a>
+        <a class="feature-card" href="{% url 'dashboard' %}">
+            <span class="feature-icon">D</span>
+            <h2>Dashboard</h2>
+            <p>Track bookings, earnings, statuses, and consultation activity.</p>
+        </a>
+        <a class="feature-card" href="{% url 'pandit_signup' %}">
+            <span class="feature-icon">R</span>
+            <h2>Pandit Register</h2>
+            <p>Create a pandit profile with expertise, bio, and consultation fee.</p>
+        </a>
+        <a class="feature-card" href="mailto:realjyotish0001@gmail.com">
+            <span class="feature-icon">C</span>
+            <h2>Contact</h2>
+            <p>Email RealJyotish directly for support, onboarding, and queries.</p>
+        </a>
+        <a class="feature-card" href="#community-comments">
+            <span class="feature-icon">S</span>
+            <h2>Community</h2>
+            <p>Read what people say and share your own public feedback.</p>
+        </a>
+        <a class="feature-card" href="{% url 'home' %}">
+            <span class="feature-icon">H</span>
+            <h2>Home Tools</h2>
+            <p>Explore customer, pandit, and admin features from one homepage.</p>
+        </a>
+    </div>
+</section>
+
+<section class="comments-section" id="community-comments">
+    <div class="comments-layout">
+        <section class="panel comment-form">
+            <span class="section-kicker">Community comments</span>
+            <h2 class="page-title">Share your experience.</h2>
+            <p class="page-copy">Your comment will appear on the home page for everyone.</p>
+
+            {% if messages %}
+                <ul class="messages" style="margin-top: 18px;">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <form method="POST" style="margin-top: 22px;">
+                {% csrf_token %}
+                <div class="form-field">
+                    <label for="comment-name">Name</label>
+                    <input id="comment-name" type="text" name="name" value="{% if user.is_authenticated %}{{ user.username }}{% endif %}" placeholder="Your name" required>
+                </div>
+                <div class="form-field">
+                    <label for="comment-message">Comment</label>
+                    <textarea id="comment-message" name="message" rows="4" placeholder="Write your comment..." required></textarea>
+                </div>
+                <button class="btn btn-primary" type="submit">Post Comment</button>
+            </form>
+        </section>
+
+        <section class="panel comment-list-panel">
+            <span class="section-kicker">What people say</span>
+            <h2 class="page-title">Latest comments</h2>
+
+            <div class="comment-list">
+                {% for comment in comments %}
+                    <article class="comment-card">
+                        <strong>{{ comment.name }}</strong>
+                        <p>{{ comment.message }}</p>
+                        <span>{{ comment.created_at|date:"M d, Y" }}</span>
+                    </article>
+                {% empty %}
+                    <article class="comment-card">
+                        <strong>No comments yet</strong>
+                        <p>Be the first person to share your experience.</p>
+                    </article>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+</section>
+
+{% endblock %}

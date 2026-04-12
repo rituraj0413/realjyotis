@@ -1,0 +1,41 @@
+services:
+  - type: web
+    name: realjyotish
+    env: python
+    plan: free
+    buildCommand: ./build.sh
+    startCommand: gunicorn astro_project.wsgi:application
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.3
+      - key: DEBUG
+        value: false
+      - key: ALLOWED_HOSTS
+        value: realjyotish.onrender.com
+      - key: CSRF_TRUSTED_ORIGINS
+        value: https://realjyotish.onrender.com
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_MODEL
+        value: llama-3.3-70b-versatile
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: EMAIL_HOST
+        value: smtp.gmail.com
+      - key: EMAIL_PORT
+        value: 587
+      - key: EMAIL_USE_TLS
+        value: true
+      - key: EMAIL_HOST_USER
+        sync: false
+      - key: EMAIL_HOST_PASSWORD
+        sync: false
+      - key: DEFAULT_FROM_EMAIL
+        sync: false

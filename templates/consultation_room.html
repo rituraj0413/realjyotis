@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+    .room-grid {
+        display: grid;
+        gap: 20px;
+        grid-template-columns: minmax(300px, 0.35fr) minmax(0, 0.65fr);
+    }
+
+    .room-panel {
+        padding: 24px;
+    }
+
+    .room-meta {
+        background: #fffaf0;
+        border: 1px solid #e8d7ac;
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .timer-chip {
+        background: #1f1608;
+        border-radius: 8px;
+        color: #f6d37b;
+        display: inline-flex;
+        font-size: 15px;
+        font-weight: 800;
+        margin-top: 16px;
+        padding: 10px 12px;
+    }
+
+    .timer-note {
+        color: var(--muted);
+        font-size: 14px;
+        margin-top: 10px;
+    }
+
+    .room-ended {
+        align-items: center;
+        background: #fff8e8;
+        color: #6f4b00;
+        display: none;
+        font-size: 20px;
+        font-weight: 800;
+        height: 100%;
+        justify-content: center;
+        min-height: 720px;
+        padding: 24px;
+        text-align: center;
+    }
+
+    .room-frame {
+        background: #ffffff;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        min-height: 720px;
+        overflow: hidden;
+    }
+
+    .room-frame iframe {
+        border: 0;
+        display: block;
+        height: 720px;
+        width: 100%;
+    }
+
+    @media (max-width: 960px) {
+        .room-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .room-frame,
+        .room-frame iframe {
+            min-height: 560px;
+            height: 560px;
+        }
+    }
+</style>
+
+<section class="page-section">
+    <div class="content-wrap room-grid">
+        <aside class="panel room-panel">
+            <span class="section-kicker">Private consultation room</span>
+            <h1 class="page-title">{{ booking.pandit.name }}</h1>
+            <p class="page-copy">
+                This room is only for the paid user and the assigned pandit.
+                Use the same link from the dashboards to reconnect if the page refreshes.
+            </p>
+
+            <div class="room-meta">
+                <p class="page-copy"><strong>User:</strong> {{ booking.user.username }}</p>
+                <p class="page-copy"><strong>Pandit:</strong> {{ booking.pandit.name }}</p>
+                <p class="page-copy"><strong>Booking:</strong> {{ booking.date }} at {{ booking.time }}</p>
+                <p class="page-copy"><strong>Status:</strong> {{ booking.get_status_display }}</p>
+                <p class="page-copy"><strong>Room ID:</strong> {{ room_name }}</p>
+                <div class="timer-chip">Time left: <span id="countdown" style="margin-left: 8px;">--:--</span></div>
+                <p class="timer-note">Session access: {{ duration_minutes }} minutes{% if duration_minutes == 1440 %} (1 day){% endif %}. The timer starts from the first room join.</p>
+            </div>
+
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px;">
+                <a class="btn btn-primary" href="{{ jitsi_room_url }}" target="_blank" rel="noopener noreferrer">Open in new tab</a>
+                <a class="btn btn-secondary" href="{% url 'dashboard' %}">Back to dashboard</a>
+            </div>
+        </aside>
+
+        <section class="panel room-panel room-frame">
+            <iframe
+                id="consult-frame"
+                allow="camera; microphone; display-capture; fullscreen; clipboard-read; clipboard-write"
+                referrerpolicy="strict-origin-when-cross-origin"
+                src="{{ jitsi_room_url }}#userInfo.displayName=&config.prejoinPageEnabled=true&config.startWithAudioMuted=false&config.startWithVideoMuted=true">
+            </iframe>
+            <div id="room-ended" class="room-ended">
+                Session time is over. Please recharge or book again to continue this consultation.
+            </div>
+        </section>
+    </div>
+</section>
+
+<script>
+    (function() {
+        var remaining = {{ remaining_seconds|default:0 }};
+        var countdown = document.getElementById("countdown");
+        var iframe = document.getElementById("consult-frame");
+        var ended = document.getElementById("room-ended");
+
+        function renderTime() {
+            if (remaining <= 0) {
+                countdown.textContent = "00:00";
+                iframe.style.display = "none";
+                ended.style.display = "flex";
+                return;
+            }
+
+            var hours = Math.floor(remaining / 3600);
+            var minutes = Math.floor((remaining % 3600) / 60);
+            var seconds = remaining % 60;
+            if (hours > 0) {
+                countdown.textContent =
+                    String(hours).padStart(2, "0") + ":" +
+                    String(minutes).padStart(2, "0") + ":" +
+                    String(seconds).padStart(2, "0");
+            } else {
+                countdown.textContent =
+                    String(minutes).padStart(2, "0") + ":" +
+                    String(seconds).padStart(2, "0");
+            }
+        }
+
+        renderTime();
+        var timer = window.setInterval(function() {
+            remaining -= 1;
+            renderTime();
+            if (remaining <= 0) {
+                window.clearInterval(timer);
+            }
+        }, 1000);
+    })();
+</script>
+
+{% endblock %}

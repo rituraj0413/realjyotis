@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="page-section">
+    <div class="content-wrap auth-layout">
+        <aside class="visual-panel panel">
+            <span class="section-kicker">Get started</span>
+            <h1>Create a calm place for your readings.</h1>
+            <p>Your dashboard keeps kundli generation, AI guidance, and consultation booking easy to reach.</p>
+        </aside>
+
+        <section class="form-panel panel">
+            <h1>Signup</h1>
+            <p>Create your account, add your birth details, and verify your email before signing in.</p>
+
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-field">
+                    <label for="full_name">Full name</label>
+                    <input id="full_name" type="text" name="full_name" placeholder="Enter full name" required>
+                </div>
+                <div class="form-field">
+                    <label for="username">Username</label>
+                    <input id="username" type="text" name="username" placeholder="Choose username" required>
+                </div>
+                <div class="form-field">
+                    <label for="email">Email</label>
+                    <input id="email" type="email" name="email" placeholder="Enter email address" required>
+                </div>
+                <div class="form-field">
+                    <label for="password">Password</label>
+                    <input id="password" type="password" name="password" placeholder="Create password" required>
+                </div>
+                <div class="form-field">
+                    <label for="birth_date">Birth date</label>
+                    <input id="birth_date" type="date" name="birth_date" required>
+                </div>
+                <div class="form-field">
+                    <label for="birth_time">Birth time</label>
+                    <input id="birth_time" type="time" name="birth_time" required>
+                </div>
+                <div class="form-field">
+                    <label for="birth_place">Place of birth</label>
+                    <input id="birth_place" type="text" name="birth_place" placeholder="City, state, country" required>
+                </div>
+                <button class="btn btn-primary" type="submit">Signup</button>
+            </form>
+
+            <p style="margin-top: 20px;">Already registered? <a class="muted-link" href="{% url 'login' %}">Login</a></p>
+        </section>
+    </div>
+</section>
+
+{% endblock %}

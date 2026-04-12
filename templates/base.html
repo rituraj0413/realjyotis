@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>RealJyotish</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --page: #f4eee1;
+            --panel: #ffffff;
+            --ink: #18140d;
+            --muted: #685f50;
+            --line: rgba(120, 93, 34, 0.16);
+            --teal: #8b6925;
+            --teal-soft: rgba(180, 133, 34, 0.18);
+            --coral: #f47264;
+            --gold: #b88927;
+            --shadow: 0 24px 54px rgba(76, 55, 13, 0.14);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background:
+                radial-gradient(circle at 12% 10%, rgba(227, 189, 98, 0.22), transparent 22%),
+                radial-gradient(circle at 88% 16%, rgba(255, 236, 184, 0.45), transparent 24%),
+                radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.55), transparent 34%),
+                linear-gradient(180deg, #fcf7ea 0%, #f8f0d9 24%, #f4ead0 56%, var(--page) 100%);
+            color: var(--ink);
+            font-family: 'Poppins', Arial, sans-serif;
+            margin: 0;
+        }
+
+        a {
+            color: inherit;
+        }
+
+        .navbar {
+            align-items: center;
+            background: rgba(255, 251, 242, 0.76);
+            border-bottom: 1px solid rgba(200, 154, 61, 0.16);
+            box-shadow: 0 10px 30px rgba(148, 116, 45, 0.10);
+            backdrop-filter: blur(14px);
+            display: flex;
+            gap: 20px;
+            justify-content: space-between;
+            min-height: 76px;
+            padding: 16px 40px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .brand {
+            align-items: center;
+            color: var(--ink);
+            display: flex;
+            font-size: 20px;
+            font-weight: 800;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .brand-mark {
+            align-items: center;
+            background: linear-gradient(135deg, #744f11, #c9962e);
+            border-radius: 8px;
+            color: #ffffff;
+            display: inline-flex;
+            height: 38px;
+            justify-content: center;
+            width: 38px;
+        }
+
+        .nav-links {
+            align-items: center;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .nav-links a {
+            border-radius: 8px;
+            color: #5f5543;
+            font-size: 14px;
+            font-weight: 700;
+            padding: 10px 12px;
+            text-decoration: none;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            background: var(--teal-soft);
+            color: #7b5d1e;
+        }
+
+        .app-shell {
+            min-height: calc(100vh - 76px);
+        }
+
+        .page-section {
+            padding: 44px 24px 64px;
+        }
+
+        .content-wrap {
+            margin: 0 auto;
+            max-width: 1180px;
+        }
+
+        .panel {
+            background: rgba(255, 251, 244, 0.84);
+            border: 1px solid rgba(255, 244, 220, 0.72);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(14px);
+        }
+
+        .section-kicker {
+            color: #8b6925;
+            display: block;
+            font-size: 13px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .page-title {
+            color: var(--ink);
+            font-size: 36px;
+            line-height: 1.18;
+            margin: 0;
+        }
+
+        .page-copy {
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1.75;
+            margin: 16px 0 0;
+        }
+
+        .btn {
+            align-items: center;
+            border: 0;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            font: inherit;
+            font-weight: 800;
+            justify-content: center;
+            min-height: 46px;
+            padding: 0 18px;
+            text-decoration: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #744f11, #bf8d2b);
+            box-shadow: 0 16px 30px rgba(122, 87, 19, 0.24);
+            color: #ffffff;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 251, 243, 0.92);
+            border: 1px solid var(--line);
+            color: var(--ink);
+        }
+
+        .form-field {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .form-field label {
+            color: #435269;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        input,
+        textarea {
+            background: #ffffff;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            color: var(--ink);
+            font: inherit;
+            min-height: 48px;
+            outline: none;
+            padding: 12px 14px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            width: 100%;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: rgba(200, 154, 61, 0.55);
+            box-shadow: 0 0 0 4px rgba(200, 154, 61, 0.14);
+        }
+
+        .messages {
+            display: grid;
+            gap: 10px;
+            margin: 0 0 18px;
+            padding: 0;
+        }
+
+        .messages li {
+            background: var(--teal-soft);
+            border: 1px solid rgba(200, 154, 61, 0.22);
+            border-radius: 8px;
+            color: #8a6a20;
+            font-weight: 700;
+            list-style: none;
+            padding: 12px 14px;
+        }
+
+        .auth-layout,
+        .split-layout {
+            display: grid;
+            gap: 24px;
+            grid-template-columns: minmax(0, 0.95fr) minmax(320px, 1.05fr);
+            align-items: stretch;
+        }
+
+        .visual-panel {
+            background:
+                linear-gradient(180deg, rgba(22, 32, 51, 0.08), rgba(22, 32, 51, 0.54)),
+                url('https://images.unsplash.com/photo-1532968961962-8a0cb3a2d4f5?auto=format&fit=crop&w=1400&q=80');
+            background-position: center;
+            background-size: cover;
+            color: #ffffff;
+            min-height: 460px;
+            padding: 30px;
+            position: relative;
+        }
+
+        .visual-panel h1,
+        .visual-panel h2,
+        .visual-panel p {
+            max-width: 560px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .visual-panel .section-kicker {
+            color: #ffd18a;
+            position: relative;
+            z-index: 1;
+        }
+
+        .visual-panel h1,
+        .visual-panel h2 {
+            color: #ffffff;
+            font-size: 38px;
+            line-height: 1.14;
+            margin: 0;
+        }
+
+        .visual-panel p {
+            color: rgba(255, 255, 255, 0.86);
+            line-height: 1.7;
+            margin: 16px 0 0;
+        }
+
+        .form-panel {
+            padding: 32px;
+        }
+
+        .form-panel h1,
+        .form-panel h2 {
+            color: var(--ink);
+            font-size: 30px;
+            margin: 0 0 12px;
+        }
+
+        .form-panel p {
+            color: var(--muted);
+            line-height: 1.7;
+            margin: 0 0 24px;
+        }
+
+        .muted-link {
+            color: var(--teal);
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        @media (max-width: 900px) {
+            .navbar {
+                align-items: flex-start;
+                flex-direction: column;
+                padding: 16px 20px;
+                position: static;
+            }
+
+            .nav-links {
+                justify-content: flex-start;
+                width: 100%;
+            }
+
+            .auth-layout,
+            .split-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .visual-panel {
+                min-height: 340px;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .page-section {
+                padding: 28px 14px 44px;
+            }
+
+            .page-title,
+            .visual-panel h1,
+            .visual-panel h2 {
+                font-size: 28px;
+            }
+
+            .form-panel,
+            .visual-panel {
+                padding: 22px;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <a class="brand" href="{% url 'home' %}">
+            <span class="brand-mark">J</span>
+            <span>RealJyotish</span>
+        </a>
+        <div class="nav-links">
+            <a href="{% url 'home' %}">Home</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <a href="{% url 'kundli' %}">Kundli</a>
+                <a href="{% url 'chatbot' %}">AI Chat</a>
+                <a href="{% url 'book_pandit' %}">Consult</a>
+                <a href="{% url 'logout' %}">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'signup' %}">Signup</a>
+                <a href="{% url 'pandit_signup' %}">Pandit Register</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main class="app-shell">
+        {% block content %}
+        {% endblock %}
+    </main>
+</body>
+</html>

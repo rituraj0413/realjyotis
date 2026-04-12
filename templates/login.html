@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="page-section">
+    <div class="content-wrap auth-layout">
+        <aside class="visual-panel panel">
+            <span class="section-kicker">Welcome back</span>
+            <h1>Return to your astrology workspace.</h1>
+            <p>Continue your kundli readings, questions, and consultation planning from the dashboard.</p>
+        </aside>
+
+        <section class="form-panel panel">
+            <h1>Login</h1>
+            <p>Use your username or email after verifying your account from the email link.</p>
+
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-field">
+                    <label for="username">Username or email</label>
+                    <input id="username" type="text" name="username" placeholder="Enter username or email" required>
+                </div>
+                <div class="form-field">
+                    <label for="password">Password</label>
+                    <input id="password" type="password" name="password" placeholder="Enter password" required>
+                </div>
+                <button class="btn btn-primary" type="submit">Login</button>
+            </form>
+
+            <p style="margin-top: 20px;">New here? <a class="muted-link" href="{% url 'signup' %}">Create an account</a></p>
+        </section>
+    </div>
+</section>
+
+{% endblock %}
