@@ -1,11 +1,6 @@
-Django>=6.0,<6.1
-psycopg[binary]>=3.3,<3.4
-gunicorn>=23.0,<24.0
-whitenoise>=6.9,<7.0
-django==6.0.3
-groq
-razorpay
-python-dotenv
-whitenoise
-gunicorn
-dj-database-url
+Django==6.0.3
+groq==1.1.2
+gunicorn==23.0.0
+psycopg[binary]==3.3.3
+razorpay==2.0.1
+whitenoise==6.12.0

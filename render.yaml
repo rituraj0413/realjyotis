@@ -1,16 +1,17 @@
 services:
   - type: web
     name: realjyotish
-    env: python
+    runtime: python
     plan: free
     buildCommand: ./build.sh
     startCommand: gunicorn astro_project.wsgi:application --bind 0.0.0.0:$PORT
+    healthCheckPath: /
     autoDeploy: true
     envVars:
       - key: PYTHON_VERSION
-        value: 3.13.3
+        value: 3.13.5
       - key: DEBUG
-        value: false
+        value: "false"
       - key: ALLOWED_HOSTS
         value: realjyotish.onrender.com
       - key: CSRF_TRUSTED_ORIGINS
@@ -28,12 +29,11 @@ services:
       - key: RAZORPAY_KEY_SECRET
         sync: false
       - key: EMAIL_HOST
-        value: python3 manage.py createsuperuser
-
+        value: smtp.gmail.com
       - key: EMAIL_PORT
-        value: 587
+        value: "587"
       - key: EMAIL_USE_TLS
-        value: true
+        value: "true"
       - key: EMAIL_HOST_USER
         sync: false
       - key: EMAIL_HOST_PASSWORD
